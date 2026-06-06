@@ -1,0 +1,7 @@
+tree,sample,group,n_intervals,mean_flow_mm_min,sd_flow
+T1,FT01,Bokashi,5,4.305,0.196
+T2,FT02,Bokashi,5,39.075,14.393
+T3,FT03,Bokashi,11,37.854,15.396
+T4,NFT04,Untreated,8,28.148,11.192
+T5,NFT05,Untreated,6,38.857,16.545
+T6,NFT06,Untreated,9,18.719,4.977

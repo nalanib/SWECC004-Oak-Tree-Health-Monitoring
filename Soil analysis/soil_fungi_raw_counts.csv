@@ -1,0 +1,232 @@
+tree,sample,morphotype,replicate,count
+T1,FT01,medium white fuzz,1,0
+T1,FT01,medium white fuzz,2,0
+T1,FT01,medium white fuzz,3,0
+T2,FT02,medium white fuzz,1,15
+T2,FT02,medium white fuzz,2,17
+T2,FT02,medium white fuzz,3,7
+T3,FT03,medium white fuzz,1,10
+T3,FT03,medium white fuzz,2,5
+T3,FT03,medium white fuzz,3,0
+T4,NFT04,medium white fuzz,1,0
+T4,NFT04,medium white fuzz,2,0
+T4,NFT04,medium white fuzz,3,0
+T5,NFT05,medium white fuzz,1,0
+T5,NFT05,medium white fuzz,2,0
+T5,NFT05,medium white fuzz,3,0
+T6,NFT06,medium white fuzz,1,0
+T6,NFT06,medium white fuzz,2,0
+T6,NFT06,medium white fuzz,3,15
+T7,HT07,medium white fuzz,1,8
+T7,HT07,medium white fuzz,2,0
+T7,HT07,medium white fuzz,3,77
+T1,FT01,large white fuzz,1,13
+T1,FT01,large white fuzz,2,10
+T1,FT01,large white fuzz,3,17
+T2,FT02,large white fuzz,1,10
+T2,FT02,large white fuzz,2,3
+T2,FT02,large white fuzz,3,9
+T3,FT03,large white fuzz,1,9
+T3,FT03,large white fuzz,2,10
+T3,FT03,large white fuzz,3,3
+T4,NFT04,large white fuzz,1,0
+T4,NFT04,large white fuzz,2,2
+T4,NFT04,large white fuzz,3,11
+T5,NFT05,large white fuzz,1,5
+T5,NFT05,large white fuzz,2,8
+T5,NFT05,large white fuzz,3,13
+T6,NFT06,large white fuzz,1,8
+T6,NFT06,large white fuzz,2,7
+T6,NFT06,large white fuzz,3,0
+T7,HT07,large white fuzz,1,0
+T7,HT07,large white fuzz,2,25
+T7,HT07,large white fuzz,3,171
+T1,FT01,"small white, little fuzz",1,500
+T1,FT01,"small white, little fuzz",2,170
+T1,FT01,"small white, little fuzz",3,100
+T2,FT02,"small white, little fuzz",1,70
+T2,FT02,"small white, little fuzz",2,60
+T2,FT02,"small white, little fuzz",3,100
+T3,FT03,"small white, little fuzz",1,120
+T3,FT03,"small white, little fuzz",2,100
+T3,FT03,"small white, little fuzz",3,80
+T4,NFT04,"small white, little fuzz",1,75
+T4,NFT04,"small white, little fuzz",2,85
+T4,NFT04,"small white, little fuzz",3,50
+T5,NFT05,"small white, little fuzz",1,50
+T5,NFT05,"small white, little fuzz",2,50
+T5,NFT05,"small white, little fuzz",3,120
+T6,NFT06,"small white, little fuzz",1,160
+T6,NFT06,"small white, little fuzz",2,100
+T6,NFT06,"small white, little fuzz",3,120
+T7,HT07,"small white, little fuzz",1,100
+T7,HT07,"small white, little fuzz",2,80
+T7,HT07,"small white, little fuzz",3,2790
+T1,FT01,medium clear spots,1,0
+T1,FT01,medium clear spots,2,0
+T1,FT01,medium clear spots,3,0
+T2,FT02,medium clear spots,1,0
+T2,FT02,medium clear spots,2,0
+T2,FT02,medium clear spots,3,1
+T3,FT03,medium clear spots,1,1
+T3,FT03,medium clear spots,2,0
+T3,FT03,medium clear spots,3,14
+T4,NFT04,medium clear spots,1,10
+T4,NFT04,medium clear spots,2,10
+T4,NFT04,medium clear spots,3,0
+T5,NFT05,medium clear spots,1,0
+T5,NFT05,medium clear spots,2,0
+T5,NFT05,medium clear spots,3,0
+T6,NFT06,medium clear spots,1,0
+T6,NFT06,medium clear spots,2,0
+T6,NFT06,medium clear spots,3,0
+T7,HT07,medium clear spots,1,0
+T7,HT07,medium clear spots,2,0
+T7,HT07,medium clear spots,3,36
+T1,FT01,"small yellow, little fuzz",1,10
+T1,FT01,"small yellow, little fuzz",2,3
+T1,FT01,"small yellow, little fuzz",3,4
+T2,FT02,"small yellow, little fuzz",1,2
+T2,FT02,"small yellow, little fuzz",2,7
+T2,FT02,"small yellow, little fuzz",3,5
+T3,FT03,"small yellow, little fuzz",1,1
+T3,FT03,"small yellow, little fuzz",2,4
+T3,FT03,"small yellow, little fuzz",3,2
+T4,NFT04,"small yellow, little fuzz",1,1
+T4,NFT04,"small yellow, little fuzz",2,10
+T4,NFT04,"small yellow, little fuzz",3,5
+T5,NFT05,"small yellow, little fuzz",1,6
+T5,NFT05,"small yellow, little fuzz",2,16
+T5,NFT05,"small yellow, little fuzz",3,2
+T6,NFT06,"small yellow, little fuzz",1,3
+T6,NFT06,"small yellow, little fuzz",2,3
+T6,NFT06,"small yellow, little fuzz",3,4
+T7,HT07,"small yellow, little fuzz",1,0
+T7,HT07,"small yellow, little fuzz",2,2
+T7,HT07,"small yellow, little fuzz",3,98
+T1,FT01,small green fuzz,1,10
+T1,FT01,small green fuzz,2,10
+T1,FT01,small green fuzz,3,5
+T2,FT02,small green fuzz,1,3
+T2,FT02,small green fuzz,2,3
+T2,FT02,small green fuzz,3,3
+T3,FT03,small green fuzz,1,2
+T3,FT03,small green fuzz,2,0
+T3,FT03,small green fuzz,3,2
+T4,NFT04,small green fuzz,1,0
+T4,NFT04,small green fuzz,2,1
+T4,NFT04,small green fuzz,3,5
+T5,NFT05,small green fuzz,1,1
+T5,NFT05,small green fuzz,2,2
+T5,NFT05,small green fuzz,3,3
+T6,NFT06,small green fuzz,1,20
+T6,NFT06,small green fuzz,2,6
+T6,NFT06,small green fuzz,3,3
+T7,HT07,small green fuzz,1,5
+T7,HT07,small green fuzz,2,4
+T7,HT07,small green fuzz,3,113
+T1,FT01,medium black with little spots,1,0
+T1,FT01,medium black with little spots,2,0
+T1,FT01,medium black with little spots,3,0
+T2,FT02,medium black with little spots,1,0
+T2,FT02,medium black with little spots,2,0
+T2,FT02,medium black with little spots,3,0
+T3,FT03,medium black with little spots,1,0
+T3,FT03,medium black with little spots,2,0
+T3,FT03,medium black with little spots,3,0
+T4,NFT04,medium black with little spots,1,0
+T4,NFT04,medium black with little spots,2,0
+T4,NFT04,medium black with little spots,3,0
+T5,NFT05,medium black with little spots,1,0
+T5,NFT05,medium black with little spots,2,0
+T5,NFT05,medium black with little spots,3,1
+T6,NFT06,medium black with little spots,1,0
+T6,NFT06,medium black with little spots,2,0
+T6,NFT06,medium black with little spots,3,3
+T7,HT07,medium black with little spots,1,3
+T7,HT07,medium black with little spots,2,1
+T7,HT07,medium black with little spots,3,8
+T1,FT01,flat white,1,0
+T1,FT01,flat white,2,0
+T1,FT01,flat white,3,1
+T2,FT02,flat white,1,0
+T2,FT02,flat white,2,2
+T2,FT02,flat white,3,1
+T3,FT03,flat white,1,1
+T3,FT03,flat white,2,1
+T3,FT03,flat white,3,1
+T4,NFT04,flat white,1,2
+T4,NFT04,flat white,2,0
+T4,NFT04,flat white,3,1
+T5,NFT05,flat white,1,5
+T5,NFT05,flat white,2,4
+T5,NFT05,flat white,3,6
+T6,NFT06,flat white,1,3
+T6,NFT06,flat white,2,0
+T6,NFT06,flat white,3,0
+T7,HT07,flat white,1,7
+T7,HT07,flat white,2,4
+T7,HT07,flat white,3,39
+T1,FT01,flat white with pink edge,1,0
+T1,FT01,flat white with pink edge,2,0
+T1,FT01,flat white with pink edge,3,0
+T2,FT02,flat white with pink edge,1,0
+T2,FT02,flat white with pink edge,2,0
+T2,FT02,flat white with pink edge,3,0
+T3,FT03,flat white with pink edge,1,0
+T3,FT03,flat white with pink edge,2,0
+T3,FT03,flat white with pink edge,3,0
+T4,NFT04,flat white with pink edge,1,0
+T4,NFT04,flat white with pink edge,2,0
+T4,NFT04,flat white with pink edge,3,0
+T5,NFT05,flat white with pink edge,1,6
+T5,NFT05,flat white with pink edge,2,0
+T5,NFT05,flat white with pink edge,3,0
+T6,NFT06,flat white with pink edge,1,0
+T6,NFT06,flat white with pink edge,2,0
+T6,NFT06,flat white with pink edge,3,0
+T7,HT07,flat white with pink edge,1,0
+T7,HT07,flat white with pink edge,2,0
+T7,HT07,flat white with pink edge,3,6
+T1,FT01,small dark pink,1,200
+T1,FT01,small dark pink,2,100
+T1,FT01,small dark pink,3,0
+T2,FT02,small dark pink,1,10
+T2,FT02,small dark pink,2,0
+T2,FT02,small dark pink,3,30
+T3,FT03,small dark pink,1,30
+T3,FT03,small dark pink,2,40
+T3,FT03,small dark pink,3,2
+T4,NFT04,small dark pink,1,0
+T4,NFT04,small dark pink,2,0
+T4,NFT04,small dark pink,3,4
+T5,NFT05,small dark pink,1,100
+T5,NFT05,small dark pink,2,40
+T5,NFT05,small dark pink,3,200
+T6,NFT06,small dark pink,1,120
+T6,NFT06,small dark pink,2,80
+T6,NFT06,small dark pink,3,75
+T7,HT07,small dark pink,1,75
+T7,HT07,small dark pink,2,100
+T7,HT07,small dark pink,3,1406
+T1,FT01,flat pink,1,0
+T1,FT01,flat pink,2,0
+T1,FT01,flat pink,3,0
+T2,FT02,flat pink,1,0
+T2,FT02,flat pink,2,0
+T2,FT02,flat pink,3,0
+T3,FT03,flat pink,1,0
+T3,FT03,flat pink,2,0
+T3,FT03,flat pink,3,0
+T4,NFT04,flat pink,1,0
+T4,NFT04,flat pink,2,1
+T4,NFT04,flat pink,3,5
+T5,NFT05,flat pink,1,0
+T5,NFT05,flat pink,2,0
+T5,NFT05,flat pink,3,0
+T6,NFT06,flat pink,1,0
+T6,NFT06,flat pink,2,0
+T6,NFT06,flat pink,3,0
+T7,HT07,flat pink,1,0
+T7,HT07,flat pink,2,0
+T7,HT07,flat pink,3,6
