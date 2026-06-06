@@ -9,7 +9,7 @@ comparing three bokashi-treated trees (FT01–FT03), three untreated trees
 
 ## Contents
 
-- **SWECC004 Monitoring Plan (Sections 2.1–2.6 + Reading Guide).docx** — the project monitoring plan that the field and laboratory protocols operationalise
+- **SWECC004 Monitoring Plan.pdf** — the project monitoring plan that the field and laboratory protocols operationalise
 - **Leaf nutrient analysis/** — MP-AES leaf elemental data and calibration script
 - **Chlorophyll analysis/** — UV-Vis chlorophyll data, equations, and analysis
 - **PhotoFolia analysis/** — PhotoFolia colour readings matched to spectrophotometer chlorophyll
