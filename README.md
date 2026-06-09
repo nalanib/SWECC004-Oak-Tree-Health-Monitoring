@@ -17,7 +17,7 @@ comparing three bokashi-treated trees (FT01–FT03), three untreated trees
 - **Visual crown assessment/** — crown defoliation, transparency, and dieback scores
 - **Comparison analysis/** — integrated per-tree dataset combining all indicators
 
-Each analysis folder contains the description `.pdf`, figures in `.jpn`, the  raw `.csv` data, and the `.R` script used to process it.
+Each analysis folder contains the description `.pdf`, figures in `.png`, the  raw `.csv` data, and the `.R` script used to process it.
 
 ## Authors
 
