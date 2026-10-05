@@ -4,13 +4,13 @@
 
 # ---- 3.1 Calculator --------------------------------------------------------
 # Percentage of your life spent at this university.
-# Replace 2024 (start year) and 2004 (birth year) with your own years.
-(2026 - 2024) / (2026 - 2004) * 100
+# Started at university in 2022, born in 2004.
+(2026 - 2022) / (2026 - 2004) * 100      # 18.18 %
 
 # ---- 3.2 Workspace ---------------------------------------------------------
 # Same computation, with several steps in between.
 current_year = 2026
-start_year = 2024
+start_year = 2022
 birth_year = 2004
 years_at_uni = current_year - start_year
 age = current_year - birth_year
@@ -93,8 +93,8 @@ mean(sqrt(r), na.rm = TRUE)
 
 # ---- 10.2 Dates ------------------------------------------------------------
 # Presents on today, Sinterklaas 2017 and your next birthday.
-# Replace the birthday with your own.
-dates = strptime(c("20261005", "20171205", "20270315"), format = "%Y%m%d")
+# Next birthday: 22 May 2027.
+dates = strptime(c("20261005", "20171205", "20270522"), format = "%Y%m%d")
 presents = c(0, 3, 2)
 plot(dates, presents, type = "p", pch = 20, cex = 2,
      xlab = "Date", ylab = "Number of presents")
