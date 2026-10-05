@@ -41,8 +41,8 @@ P = seq(from = 31, to = 60)
 Q = matrix(data = P, nrow = 6, ncol = 5)
 P
 Q
-# In the environment window P shows as "num [1:30] 31 32 33 ..." (a vector),
-# Q as "num [1:6, 1:5] 31 32 33 ..." (a matrix) and a scalar such as
+# In the environment window P shows as "int [1:30] 31 32 33 ..." (a vector),
+# Q as "int [1:6, 1:5] 31 32 33 ..." (a matrix) and a scalar such as
 # percentage just as its value.
 
 # ---- 6.3 Data frames -------------------------------------------------------
