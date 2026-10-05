@@ -199,3 +199,9 @@ with the data in `data/`. Numbers refer to the answer boxes in the assignment PD
 **147.** No. With j from field data (716 h), NS = **−0.96**: the modelled direct runoff is far too low and spread out over far too long a period, with no peak. Only with a much smaller (calibrated) j of about 40 h is the fit reasonable (NS = 0.73), and that value is outside the physically realistic range.
 
 **148.** The j-model describes slow groundwater flow to the ditches. Fast flow routes aren't included: overland flow (infiltration-excess and saturation-excess), direct rain on the channels, interflow (shallow subsurface flow) and, in Hupsel in particular, flow through tile drains.
+
+**149.** Calibrated j = **40 h** (highest NS for 4–9 Feb 2002).
+
+**150.** NS = **0.73**, lower than the triangular UH (0.93).
+
+**151.** The j-model UH has its maximum at t = 1 h and no rising limb (no travel time to the outlet), so the modelled discharge reacts immediately to the rain and peaks too early. To get a peak at all, j has to be small, which makes the recession too fast.
