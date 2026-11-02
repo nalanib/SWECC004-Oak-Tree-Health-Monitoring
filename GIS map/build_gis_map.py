@@ -1,0 +1,281 @@
+"""Build the SWECC004 field GIS map from the 29 Oct 2026 GPX recordings.
+
+Run:  python3 build_gis_map.py            (from inside the "GIS map" folder)
+Needs: geopandas, shapely, pyproj, pyogrio, matplotlib
+
+Cleaning steps (each one is asserted, so the script stops if the data
+does not look exactly as expected):
+  1. g01 (pond): drop the 2 track points stamped 13:39:57Z (GPS jump of
+     33.5 m and 20.5 m next to waypoint "g01_v10 - glitch").
+  2. trees: keep only waypoints (Type = WPT) t01-t16; the 147 track points
+     in the same file are discarded.
+  3. g03: drop the stray waypoint named "2:56:04 PM" (accidental tap,
+     far south of the lawn). The g03 polygon is built from the track only.
+  4. Feature IDs follow the file names: g01-g07, path1-path4, t01-t16.
+  5. Study-area extent is computed from ALL features, so g02, g07 and
+     path4 (south-west, outside the planned area) are included.
+"""
+import json
+import os
+import xml.etree.ElementTree as ET
+
+import geopandas as gpd
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.patheffects as pe
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
+from shapely.geometry import LineString, Point, Polygon, box
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+RAW = os.path.join(HERE, "raw_gpx")
+OUT = os.path.join(HERE, "output")
+os.makedirs(OUT, exist_ok=True)
+NS = {"g": "http://www.topografix.com/GPX/1/1"}
+RD = "EPSG:28992"  # Amersfoort / RD New
+
+POLYGONS = {  # id: (file, label taken from the file name)
+    "g01": ("g01_-_pond_.gpx", "pond"),
+    "g02": ("g02_-_gravel.gpx", "gravel"),
+    "g03": ("g03_-_mostly_mowed.gpx", "mostly mowed"),
+    "g04": ("g04_-_Orion_.gpx", "Orion"),
+    "g05": ("g05_-_unmowed_shrubs.gpx", "unmowed shrubs"),
+    "g06": ("g06_-_atlas__unmowed.gpx", "Atlas, unmowed"),
+    "g07": ("g07_-_unmowed_trees_shrubs.gpx", "unmowed trees/shrubs"),
+}
+PATHS = {f"path{i}": f"29-okt-2026-path{i}.gpx" for i in range(1, 5)}
+TREES = "trees_-_points.gpx"
+OUTSIDE_PLANNED = {"g02", "g07", "path4"}
+
+removed = []  # audit log of everything deleted
+
+
+def parse(fname):
+    root = ET.parse(os.path.join(RAW, fname)).getroot()
+    wpts = [
+        dict(name=w.findtext("g:name", namespaces=NS), lat=float(w.get("lat")),
+             lon=float(w.get("lon")), time=w.findtext("g:time", namespaces=NS),
+             ele=w.findtext("g:ele", namespaces=NS))
+        for w in root.findall("g:wpt", NS)
+    ]
+    segs = [
+        [dict(lat=float(p.get("lat")), lon=float(p.get("lon")),
+              time=p.findtext("g:time", namespaces=NS)) for p in s.findall("g:trkpt", NS)]
+        for s in root.findall(".//g:trkseg", NS)
+    ]
+    return wpts, segs
+
+
+# ---------------------------------------------------------------- polygons
+poly_rows = []
+for gid, (fname, label) in POLYGONS.items():
+    wpts, segs = parse(fname)
+    assert len(segs) == 1, f"{gid}: expected 1 track segment"
+    pts = segs[0]
+
+    if gid == "g01":  # FIX 1
+        bad = [p for p in pts if p["time"] == "2026-10-29T13:39:57Z"]
+        assert len(bad) == 2, f"g01: expected 2 glitch points, found {len(bad)}"
+        for p in bad:
+            removed.append(dict(layer="g01 track", what="track point", time=p["time"],
+                                lat=p["lat"], lon=p["lon"], reason="GPS jump next to 'g01_v10 - glitch'"))
+        pts = [p for p in pts if p["time"] != "2026-10-29T13:39:57Z"]
+        assert not Polygon([(p["lon"], p["lat"]) for p in pts]).is_valid
+        # FIX 1b: with the 2 jumps gone, the ~1 m back-step at 13:39:59 makes the
+        # edge 13:39:26->13:39:58 cross 13:39:59->13:40:01 (a bow-tie). Drop it too.
+        back = [p for p in pts if p["time"] == "2026-10-29T13:39:59Z"]
+        assert len(back) == 1
+        removed.append(dict(layer="g01 track", what="track point", time=back[0]["time"],
+                            lat=back[0]["lat"], lon=back[0]["lon"],
+                            reason="~1 m GPS back-step; caused self-intersection after glitch removal"))
+        pts = [p for p in pts if p["time"] != "2026-10-29T13:39:59Z"]
+
+    if gid == "g03":  # FIX 3
+        # iOS writes a narrow no-break space (U+202F) before "PM"; normalise it
+        stray = [w for w in wpts if " ".join(w["name"].replace(" ", " ").split()) == "2:56:04 PM"]
+        assert len(stray) == 1 and len(wpts) == 1, "g03: expected exactly 1 stray waypoint"
+        removed.append(dict(layer="g03 waypoints", what="waypoint '2:56:04 PM'", time=stray[0]["time"],
+                            lat=stray[0]["lat"], lon=stray[0]["lon"], reason="accidental tap, far south of lawn"))
+    elif gid != "g01":
+        assert not wpts, f"{gid}: unexpected waypoints"
+
+    poly_rows.append(dict(id=gid, label=label, source_file=fname, n_vertices=len(pts),
+                          t_start=pts[0]["time"], t_end=pts[-1]["time"],
+                          outside_planned_area=gid in OUTSIDE_PLANNED,
+                          geometry=Polygon([(p["lon"], p["lat"]) for p in pts])))
+
+polys = gpd.GeoDataFrame(poly_rows, crs="EPSG:4326").to_crs(RD)
+for _, r in polys.iterrows():
+    assert r.geometry.is_valid, f"{r.id}: polygon is not valid"
+polys["area_m2"] = polys.area.round(0)
+polys["perimeter_m"] = polys.length.round(1)
+
+# ------------------------------------------------------------------- paths
+path_rows = []
+for pid, fname in PATHS.items():
+    wpts, segs = parse(fname)
+    assert len(segs) == 1 and not wpts, f"{pid}: unexpected structure"
+    pts = segs[0]
+    path_rows.append(dict(id=pid, source_file=fname, n_vertices=len(pts),
+                          t_start=pts[0]["time"], t_end=pts[-1]["time"],
+                          outside_planned_area=pid in OUTSIDE_PLANNED,
+                          geometry=LineString([(p["lon"], p["lat"]) for p in pts])))
+paths = gpd.GeoDataFrame(path_rows, crs="EPSG:4326").to_crs(RD)
+paths["length_m"] = paths.length.round(1)
+
+# ------------------------------------------------------------------- trees
+wpts, segs = parse(TREES)  # FIX 2: keep Type = WPT only
+n_trk = sum(len(s) for s in segs)
+assert n_trk == 147, f"trees: expected 147 track points, found {n_trk}"
+names = [w["name"] for w in wpts]
+assert names == [f"t{i:02d}" for i in range(1, 17)], f"trees: unexpected waypoint names {names}"
+removed.append(dict(layer="trees", what=f"{n_trk} track points ({len(segs)} segments)", time="",
+                    lat="", lon="", reason="track not needed; keep waypoints t01-t16 only"))
+trees = gpd.GeoDataFrame(
+    [dict(id=w["name"], time=w["time"], ele_gps_m=round(float(w["ele"]), 1),
+          geometry=Point(w["lon"], w["lat"])) for w in wpts], crs="EPSG:4326").to_crs(RD)
+trees["x_rd"] = trees.geometry.x.round(2)
+trees["y_rd"] = trees.geometry.y.round(2)
+# Which mapped polygon (if any) each tree falls in
+joined = gpd.sjoin(trees, polys[["id", "geometry"]].rename(columns={"id": "in_polygon"}),
+                   how="left", predicate="within")
+assert len(joined) == len(trees), "a tree falls in more than one polygon"
+trees["in_polygon"] = joined["in_polygon"].fillna("").values
+
+# -------------------------------------------------------------- study area
+everything = list(polys.geometry) + list(paths.geometry) + list(trees.geometry)
+minx, miny, maxx, maxy = gpd.GeoSeries(everything, crs=RD).total_bounds
+study = gpd.GeoDataFrame(
+    [dict(name="SWECC004 field survey extent (all features + 10 m)",
+          geometry=box(minx - 10, miny - 10, maxx + 10, maxy + 10))], crs=RD)
+for g in polys[polys.outside_planned_area].geometry.tolist() + paths[paths.outside_planned_area].geometry.tolist():
+    assert study.geometry.iloc[0].contains(g)
+
+# ---------------------------------------------------------------- QA notes
+overlaps = []
+for i, a in polys.iterrows():
+    for j, b in polys.iterrows():
+        if i < j and a.geometry.intersects(b.geometry):
+            ov = a.geometry.intersection(b.geometry).area
+            if ov > 0.5:
+                overlaps.append((a.id, b.id, round(ov, 0)))
+
+# ------------------------------------------------------------------ export
+gpkg = os.path.join(OUT, "swecc004_field_map.gpkg")
+if os.path.exists(gpkg):
+    os.remove(gpkg)
+polys.to_file(gpkg, layer="habitat_polygons", driver="GPKG")
+paths.to_file(gpkg, layer="paths", driver="GPKG")
+trees.to_file(gpkg, layer="trees", driver="GPKG")
+study.to_file(gpkg, layer="study_area_extent", driver="GPKG")
+gpd.GeoDataFrame(removed).to_csv(os.path.join(OUT, "removed_points_log.csv"), index=False)
+
+# Attribute-join template: fill in from the printed form, keyed on `id`
+with open(os.path.join(OUT, "form_attributes_template.csv"), "w") as f:
+    f.write("id,feature_type,source_file,form_id_on_paper,notes\n")
+    for _, r in polys.iterrows():
+        f.write(f"{r.id},polygon,{r.source_file},,\n")
+    for _, r in paths.iterrows():
+        f.write(f"{r.id},path,{r.source_file},,\n")
+    for _, r in trees.iterrows():
+        f.write(f"{r.id},tree,{TREES},,\n")
+
+wgs = {k: json.loads(v.to_crs(4326).to_json()) for k, v in
+       dict(polygons=polys, paths=paths, trees=trees, study=study).items()}
+
+# ------------------------------------------------------------- static map
+COL = {"g01": "#4f9bd9", "g02": "#b9b2a5", "g03": "#9ed07f", "g04": "#e3c26b",
+       "g05": "#6fae6a", "g06": "#c9a0d6", "g07": "#3f7f4f"}
+fig, ax = plt.subplots(figsize=(11.7, 11.0), dpi=200)
+study.boundary.plot(ax=ax, color="#555", lw=0.8, linestyle=":")
+for _, r in polys.iterrows():
+    gpd.GeoSeries([r.geometry]).plot(ax=ax, color=COL[r.id], alpha=0.55, edgecolor="#222",
+                                     lw=1.6 if r.outside_planned_area else 0.8,
+                                     ls="--" if r.outside_planned_area else "-")
+    c = r.geometry.representative_point()
+    ax.text(c.x, c.y, f"{r.id}\n{r.label}", ha="center", va="center", fontsize=7.5, weight="bold",
+            path_effects=[pe.withStroke(linewidth=2.5, foreground="white")])
+for _, r in paths.iterrows():
+    gpd.GeoSeries([r.geometry]).plot(ax=ax, color="#c0392b", lw=1.8,
+                                     ls="--" if r.outside_planned_area else "-")
+    m = r.geometry.interpolate(0.5, normalized=True)
+    ax.text(m.x, m.y, r.id, fontsize=7, color="#c0392b", weight="bold",
+            path_effects=[pe.withStroke(linewidth=2.5, foreground="white")])
+trees.plot(ax=ax, color="#145a32", markersize=38, edgecolor="white", lw=0.8, zorder=5)
+for _, r in trees.iterrows():
+    ax.annotate(r.id, (r.geometry.x, r.geometry.y), xytext=(4, 4), textcoords="offset points",
+                fontsize=7, color="#145a32", weight="bold", zorder=6,
+                path_effects=[pe.withStroke(linewidth=2.5, foreground="white")])
+ax.set_aspect("equal")
+ax.set_xlim(minx - 25, maxx + 25)
+ax.set_ylim(miny - 25, maxy + 25)
+ax.ticklabel_format(useOffset=False, style="plain")
+ax.tick_params(labelsize=7)
+ax.set_xlabel("RD x (m)", fontsize=8)
+ax.set_ylabel("RD y (m)", fontsize=8)
+ax.grid(color="#ddd", lw=0.5)
+ax.set_title("SWECC004 oak monitoring – field survey 29 Oct 2026 (Wageningen Campus)", fontsize=12, weight="bold")
+# scale bar (50 m) and north arrow; RD grid north ~ true north here
+sx, sy = minx - 15, miny - 18
+ax.plot([sx, sx + 50], [sy, sy], color="k", lw=3)
+ax.text(sx + 25, sy + 3, "50 m", ha="center", fontsize=8)
+ax.annotate("N", xy=(maxx + 15, maxy + 15), xytext=(maxx + 15, maxy - 10), ha="center", fontsize=11,
+            weight="bold", arrowprops=dict(arrowstyle="-|>", color="k", lw=1.5))
+handles = [Patch(facecolor=COL[g], alpha=0.55, edgecolor="#222", label=f"{g} {POLYGONS[g][1]}") for g in COL]
+handles += [Line2D([], [], color="#c0392b", lw=1.8, label="Paths (path1–path4)"),
+            Line2D([], [], marker="o", color="w", markerfacecolor="#145a32", markersize=7, label="Oak trees t01–t16"),
+            Line2D([], [], color="#222", ls="--", lw=1.4, label="Dashed = outside planned area (g02, g07, path4)"),
+            Line2D([], [], color="#555", ls=":", lw=0.8, label="Survey extent (all features + 10 m)")]
+ax.legend(handles=handles, loc="upper left", fontsize=7.5, framealpha=0.92)
+ax.text(0.99, 0.01, "CRS: Amersfoort / RD New (EPSG:28992) · GPS: Open GPX Tracker (iOS), accuracy ≈ 3–5 m\n"
+        "Cleaned: g01 2 glitch pts + 1 back-step removed · g03 stray waypoint removed · trees = waypoints only",
+        transform=ax.transAxes, ha="right", va="bottom", fontsize=6.5, color="#444")
+fig.tight_layout()
+fig.savefig(os.path.join(OUT, "swecc004_field_map.png"))
+fig.savefig(os.path.join(OUT, "swecc004_field_map.pdf"))
+
+# ------------------------------------------------------- interactive map
+LEAF = os.environ.get("LEAFLET_DIR")  # folder holding leaflet.js / leaflet.css (inlined if given)
+if LEAF:
+    js = open(os.path.join(LEAF, "leaflet.js")).read()
+    css = open(os.path.join(LEAF, "leaflet.css")).read()
+    head = f"<style>{css}</style><script>{js}</script>"
+else:
+    head = ('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">'
+            '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>')
+html = f"""<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SWECC004 field map</title>{head}
+<style>html,body,#map{{height:100%;margin:0}} .lbl{{font:bold 11px sans-serif;color:#145a32;text-shadow:0 0 3px #fff,0 0 3px #fff}}</style>
+</head><body><div id="map"></div><script>
+const D={json.dumps(wgs)};
+const COL={json.dumps(COL)};
+const map=L.map('map');
+const osm=L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png',{{maxZoom:20,maxNativeZoom:19,attribution:'© OpenStreetMap contributors'}}).addTo(map);
+const air=L.tileLayer('https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_orthoHR/EPSG:3857/{{z}}/{{x}}/{{y}}.jpeg',{{maxZoom:21,maxNativeZoom:19,attribution:'Luchtfoto © PDOK'}});
+const pop=p=>Object.entries(p).map(([k,v])=>`<b>${{k}}</b>: ${{v}}`).join('<br>');
+const study=L.geoJSON(D.study,{{style:{{color:'#555',weight:1,dashArray:'6 4',fill:false}}}}).addTo(map);
+const polys=L.geoJSON(D.polygons,{{style:f=>({{color:'#222',weight:f.properties.outside_planned_area?2:1,dashArray:f.properties.outside_planned_area?'5 4':null,fillColor:COL[f.properties.id],fillOpacity:.45}}),
+  onEachFeature:(f,l)=>{{l.bindPopup(pop(f.properties));l.bindTooltip(f.properties.id+' '+f.properties.label);}}}}).addTo(map);
+const paths=L.geoJSON(D.paths,{{style:f=>({{color:'#c0392b',weight:3,dashArray:f.properties.outside_planned_area?'6 5':null}}),
+  onEachFeature:(f,l)=>{{l.bindPopup(pop(f.properties));l.bindTooltip(f.properties.id);}}}}).addTo(map);
+const trees=L.geoJSON(D.trees,{{pointToLayer:(f,ll)=>L.circleMarker(ll,{{radius:6,color:'#fff',weight:1,fillColor:'#145a32',fillOpacity:1}}),
+  onEachFeature:(f,l)=>{{l.bindPopup(pop(f.properties));l.bindTooltip(f.properties.id,{{permanent:true,direction:'right',className:'lbl'}});}}}}).addTo(map);
+L.control.layers({{'OpenStreetMap':osm,'Aerial photo (PDOK)':air}},{{'Survey extent':study,'Habitat polygons g01–g07':polys,'Paths path1–path4':paths,'Trees t01–t16':trees}}).addTo(map);
+L.control.scale({{imperial:false}}).addTo(map);
+map.fitBounds(study.getBounds());
+</script></body></html>"""
+with open(os.path.join(OUT, "swecc004_field_map.html"), "w") as f:
+    f.write(html)
+
+# ----------------------------------------------------------------- report
+print(polys.drop(columns="geometry").to_string(index=False))
+print(paths.drop(columns="geometry").to_string(index=False))
+print(trees.drop(columns="geometry").to_string(index=False))
+print("Removed:", *removed, sep="\n  ")
+print("Polygon overlaps (m2):", overlaps)
+b = study.to_crs(4326).total_bounds
+print(f"Survey extent RD: x {minx:.0f}-{maxx:.0f}, y {miny:.0f}-{maxy:.0f} "
+      f"({maxx - minx:.0f} x {maxy - miny:.0f} m); WGS84 lon {b[0]:.5f}-{b[2]:.5f}, lat {b[1]:.5f}-{b[3]:.5f}")

@@ -1,0 +1,6 @@
+layer,what,time,lat,lon,reason
+g01 track,track point,2026-10-29T13:39:57Z,51.98566234620008,5.664766421400585,GPS jump next to 'g01_v10 - glitch'
+g01 track,track point,2026-10-29T13:39:57Z,51.98552875269374,5.664972633783058,GPS jump next to 'g01_v10 - glitch'
+g01 track,track point,2026-10-29T13:39:59Z,51.98550673350587,5.664982161065445,~1 m GPS back-step; caused self-intersection after glitch removal
+g03 waypoints,waypoint '2:56:04 PM',2026-10-29T13:56:04Z,51.9841417106061,5.6651729515856735,"accidental tap, far south of lawn"
+trees,147 track points (2 segments),,,,track not needed; keep waypoints t01-t16 only
