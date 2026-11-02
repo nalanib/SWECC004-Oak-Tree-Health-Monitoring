@@ -9,6 +9,7 @@ Then run `QT_QPA_PLATFORM=offscreen python3 build_qgis_project.py` with the QGIS
 ## Outputs (`output/`)
 | File | Contents |
 |---|---|
+| **`swecc004_field_map.kmz`** | **Phone or no GIS software:** open it in Google Earth (iOS/Android app, or earth.google.com > Projects > Import KML file) to see all layers over satellite imagery. It also imports into QGIS and ArcGIS (WGS84). Built by `build_kmz.py` |
 | **`swecc004_qgis_package.zip`** | **Unzip and double-click `swecc004_field_map.qgz` to open in QGIS.** The project contains the styled and labelled layers, a PDOK aerial photo and an OpenStreetMap basemap (loaded live when online, in RD New), and the print layout "SWECC004 field map" (A3) with legend, scale bar and north arrow. Export it via Project > Layouts |
 | `swecc004_field_map.qgz` | Same QGIS project; keep it in the same folder as the .gpkg |
 | `swecc004_field_map.gpkg` | GeoPackage, EPSG:28992 (RD New). Layers: `habitat_polygons` (g01–g07), `paths` (path1–path4), `trees` (t01–t16), `study_area_extent` |
