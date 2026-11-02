@@ -116,6 +116,15 @@ for gid, (fname, label) in POLYGONS.items():
             removed.append(dict(layer="g01 track", what="track point", time=p["time"],
                                 lat=p["lat"], lon=p["lon"], reason="south-east lobe (v01-v04) outside pond edge"))
         pts = [p for p in pts if p not in lobe]
+        # FIX 1e: leftover tooth at the SE corner: the outline dips ~4 m south
+        # (13:36:45-13:37:00) and bumps back up at v05 (13:37:02-13:37:21) before
+        # rejoining the bottom edge. Drop these 5 pts; edge runs v04 -> 13:37:23.
+        tooth = [p for p in pts if "2026-10-29T13:36:45Z" <= p["time"] <= "2026-10-29T13:37:21Z"]
+        assert len(tooth) == 5, f"g01 tooth: expected 5, found {len(tooth)}"
+        for p in tooth:
+            removed.append(dict(layer="g01 track", what="track point", time=p["time"],
+                                lat=p["lat"], lon=p["lon"], reason="SE corner tooth left after lobe removal"))
+        pts = [p for p in pts if p not in tooth]
 
     if gid == "g03":  # FIX 3
         # iOS writes a narrow no-break space (U+202F) before "PM"; normalise it
@@ -278,7 +287,7 @@ except ImportError:
 ax.set_xlim(minx - 25, maxx + 25)
 ax.set_ylim(miny - 25, maxy + 25)
 ax.text(0.99, 0.01, "CRS: Amersfoort / RD New (EPSG:28992) · GPS: Open GPX Tracker (iOS), accuracy ≈ 3–5 m\n"
-        "Cleaned: g01 glitch (3 pts), bridge detours (18 pts) and SE lobe (28 pts) removed · g03 stray waypoint removed · trees = waypoints only"
+        "Cleaned: g01 glitch (3 pts), bridge detours (18 pts) and SE lobe + corner (33 pts) removed · g03 stray waypoint removed · trees = waypoints only"
         + BASEMAP_NOTE,
         transform=ax.transAxes, ha="right", va="bottom", fontsize=6.5, color="#444")
 fig.tight_layout()
