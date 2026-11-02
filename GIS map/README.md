@@ -33,7 +33,7 @@ Then run `QT_QPA_PLATFORM=offscreen python3 build_qgis_project.py` with the QGIS
    - The Arboreal tree centre is nearest to the tree with the same ID, and within GPS accuracy of it.
 
    The GPS waypoint is kept as the position; the Arboreal coordinates are stored as `arboreal_lat`/`arboreal_lon`, with the distance between the two in `offset_arboreal_m`.
-   - **Fields added:** `species`, `height_m` (perpendicular height), `dbh_cm`, `breast_height_m`, `inclination_deg`, `arboreal_time_local`, `arboreal_accuracy_m`, `photo` (`photos/…jpg`, relative to `output/`) and `qa_note`.
+   - **Fields added:** `species`, `height_m` (perpendicular height), `dbh_cm`, `circumference_cm` (derived: π × DBH), `breast_height_m`, `inclination_deg`, `arboreal_time_local`, `arboreal_accuracy_m`, `photo` (`photos/…jpg`, relative to `output/`) and `qa_note`.
    - **Not added:** the crown and CAI columns, because they are empty in the export, and Arboreal's internal AR marker coordinates. Both stay in the raw CSV.
    - **Typo fixed:** "Lach unknown (larix spec.)" → "Larch unknown (Larix spec.)".
    - **QA notes:**

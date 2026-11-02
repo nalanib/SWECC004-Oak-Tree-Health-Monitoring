@@ -216,6 +216,7 @@ SPECIES_FIX = {"Lach unknown (larix spec.)": "Larch unknown (Larix spec.)"}  # t
 trees["species"] = [SPECIES_FIX.get(s, s) for s in arb["Tree species"]]
 trees["height_m"] = arb["Perpendicular height (m)"].astype(float).values
 trees["dbh_cm"] = arb["Diameter (cm)"].astype(float).values
+trees["circumference_cm"] = (3.141592653589793 * trees["dbh_cm"]).round(1)  # derived: C = pi x DBH
 trees["breast_height_m"] = arb["Breast height (m)"].astype(float).values
 trees["inclination_deg"] = arb["Inclination°"].str.rstrip("°").astype(float).values
 trees["arboreal_time_local"] = arb["Time"].values
@@ -310,8 +311,15 @@ ax.set_title("SWECC004 oak monitoring – field survey 29 Oct 2026 (Wageningen C
 sx, sy = minx - 15, miny - 18
 ax.plot([sx, sx + 50], [sy, sy], color="k", lw=3)
 ax.text(sx + 25, sy + 3, "50 m", ha="center", fontsize=8)
-ax.annotate("N", xy=(maxx + 15, maxy + 15), xytext=(maxx + 15, maxy - 10), ha="center", fontsize=11,
-            weight="bold", arrowprops=dict(arrowstyle="-|>", color="k", lw=1.5))
+# North arrow (RD grid north = true north to within ~0.1 deg here): split
+# black/white arrowhead in a white box, top-right of the map
+from matplotlib.patches import FancyBboxPatch, Polygon as MplPolygon  # noqa: E402
+nx, ny, nh = maxx + 2, maxy - 22, 30  # base centre and height in metres
+ax.add_patch(FancyBboxPatch((nx - 11, ny - 6), 22, nh + 22, boxstyle="round,pad=0,rounding_size=3",
+                            fc="white", ec="#444", lw=0.8, alpha=0.95, zorder=9))
+ax.add_patch(MplPolygon([(nx, ny + nh), (nx - 7, ny), (nx, ny + 7)], closed=True, fc="black", ec="black", lw=0.8, zorder=10))
+ax.add_patch(MplPolygon([(nx, ny + nh), (nx + 7, ny), (nx, ny + 7)], closed=True, fc="white", ec="black", lw=0.8, zorder=10))
+ax.text(nx, ny + nh + 3, "N", ha="center", va="bottom", fontsize=13, weight="bold", zorder=11)
 handles = [Patch(facecolor=COL[g], alpha=0.55, edgecolor="#222", label=f"{g} {POLYGONS[g][1]}") for g in COL]
 handles += [Line2D([], [], color="#c0392b", lw=1.8, label="Paths (path1–path4)"),
             Line2D([], [], marker="o", color="w", markerfacecolor="#145a32", markersize=7, label="Trees t01–t16 (Arboreal: species, height, DBH)"),
