@@ -2,7 +2,13 @@ SWECC004 field map - ArcGIS
 ==========================
 All layers are in Amersfoort / RD New (EPSG:28992).
 
-ArcGIS Pro
+ArcGIS Pro - quickest: ONE line does everything
+  Open a project, View tab > Python window, paste (with your own path):
+    p = r"C:\path\to\swecc004_arcgis\arcgis_import_all.py"; exec(open(p).read(), {"__file__": p})
+  It attaches the photos, adds the 4 layers with colours and labels, adds the
+  Imagery basemap and zooms to the site. Then save (Ctrl+S).
+
+ArcGIS Pro - by hand
 1. Unzip this folder somewhere local (not inside the zip).
 2. Catalog pane > Add Folder Connection > this folder.
    Expand swecc004_field_map.gdb and drag the 4 feature classes onto a map.
