@@ -2,5 +2,23 @@ layer,what,time,lat,lon,reason
 g01 track,track point,2026-10-29T13:39:57Z,51.98566234620008,5.664766421400585,GPS jump next to 'g01_v10 - glitch'
 g01 track,track point,2026-10-29T13:39:57Z,51.98552875269374,5.664972633783058,GPS jump next to 'g01_v10 - glitch'
 g01 track,track point,2026-10-29T13:39:59Z,51.98550673350587,5.664982161065445,~1 m GPS back-step; caused self-intersection after glitch removal
+g01 track,track point,2026-10-29T13:38:34Z,51.98529413250568,5.665001350474337,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:38:50Z,51.985300750517446,5.664967805546499,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:38:52Z,51.9852974506205,5.664932949121835,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:39:03Z,51.98532515525925,5.664930335555485,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:39:05Z,51.98534603911582,5.664933920291056,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:39:07Z,51.98536413818431,5.664934348025026,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:42:01Z,51.98553625426658,5.6655573683485745,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:42:10Z,51.98554319661363,5.665585114122668,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:42:13Z,51.98555241821912,5.665611058310029,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:42:16Z,51.98555367506734,5.665650875314742,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:42:26Z,51.985550642136026,5.665618147118662,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:42:28Z,51.98554233429332,5.665587059910833,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:42:54Z,51.985541301039746,5.665621140691595,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:42:56Z,51.985548045714744,5.665652760988191,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:43:09Z,51.98552724004264,5.665657123597845,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:43:11Z,51.98549253680314,5.665656075571353,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:43:26Z,51.98547498502218,5.6656462379073576,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:43:28Z,51.98546329177579,5.665608907778165,pond outline detour onto the bridge (path1)
 g03 waypoints,waypoint '2:56:04 PM',2026-10-29T13:56:04Z,51.9841417106061,5.6651729515856735,"accidental tap, far south of lawn"
 trees,147 track points (2 segments),,,,track not needed; keep waypoints t01-t16 only

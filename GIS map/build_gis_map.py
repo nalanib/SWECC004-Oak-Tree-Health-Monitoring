@@ -91,6 +91,21 @@ for gid, (fname, label) in POLYGONS.items():
                             lat=back[0]["lat"], lon=back[0]["lon"],
                             reason="~1 m GPS back-step; caused self-intersection after glitch removal"))
         pts = [p for p in pts if p["time"] != "2026-10-29T13:39:59Z"]
+        # FIX 1c: remove the pond-outline vertices where the walk detoured onto the
+        # bridge (path1 crosses the pond). West abutment 13:38:34-13:39:07 (6 pts,
+        # around waypoints v06-v08), east abutment 13:42:01-13:43:28 (12 pts,
+        # around v12-v15). All lie within 5 m of path1 (asserted further down).
+        BRIDGE = [("2026-10-29T13:38:34Z", "2026-10-29T13:39:07Z", 6),
+                  ("2026-10-29T13:42:01Z", "2026-10-29T13:43:28Z", 12)]
+        bridge_pts = []
+        for t0, t1, n in BRIDGE:
+            sel = [p for p in pts if t0 <= p["time"] <= t1]
+            assert len(sel) == n, f"g01 bridge {t0}-{t1}: expected {n}, found {len(sel)}"
+            bridge_pts += sel
+        for p in bridge_pts:
+            removed.append(dict(layer="g01 track", what="track point", time=p["time"],
+                                lat=p["lat"], lon=p["lon"], reason="pond outline detour onto the bridge (path1)"))
+        pts = [p for p in pts if p not in bridge_pts]
 
     if gid == "g03":  # FIX 3
         # iOS writes a narrow no-break space (U+202F) before "PM"; normalise it
@@ -124,6 +139,9 @@ for pid, fname in PATHS.items():
                           geometry=LineString([(p["lon"], p["lat"]) for p in pts])))
 paths = gpd.GeoDataFrame(path_rows, crs="EPSG:4326").to_crs(RD)
 paths["length_m"] = paths.length.round(1)
+_p1 = paths.set_index("id").geometry["path1"]
+_br = gpd.GeoSeries([Point(p["lon"], p["lat"]) for p in bridge_pts], crs="EPSG:4326").to_crs(RD)
+assert (_br.distance(_p1) < 5).all(), "a removed bridge vertex is not within 5 m of path1"
 
 # ------------------------------------------------------------------- trees
 wpts, segs = parse(TREES)  # FIX 2: keep Type = WPT only
@@ -230,7 +248,7 @@ handles += [Line2D([], [], color="#c0392b", lw=1.8, label="Paths (path1–path4)
             Line2D([], [], color="#555", ls=":", lw=0.8, label="Survey extent (all features + 10 m)")]
 ax.legend(handles=handles, loc="upper left", fontsize=7.5, framealpha=0.92)
 ax.text(0.99, 0.01, "CRS: Amersfoort / RD New (EPSG:28992) · GPS: Open GPX Tracker (iOS), accuracy ≈ 3–5 m\n"
-        "Cleaned: g01 2 glitch pts + 1 back-step removed · g03 stray waypoint removed · trees = waypoints only",
+        "Cleaned: g01 2 glitch pts + 1 back-step + 18 bridge-detour pts removed · g03 stray waypoint removed · trees = waypoints only",
         transform=ax.transAxes, ha="right", va="bottom", fontsize=6.5, color="#444")
 fig.tight_layout()
 fig.savefig(os.path.join(OUT, "swecc004_field_map.png"))
