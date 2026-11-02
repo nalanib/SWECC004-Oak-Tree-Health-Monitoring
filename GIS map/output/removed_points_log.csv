@@ -48,10 +48,9 @@ g01 track,track point,2026-10-29T13:36:35Z,51.9844970516106,5.665756045655765,so
 g01 track,track point,2026-10-29T13:36:37Z,51.984483713666144,5.665714817713022,south-east lobe (v01-v04) outside pond edge
 g01 track,track point,2026-10-29T13:36:39Z,51.98446847027193,5.665673109569088,south-east lobe (v01-v04) outside pond edge
 g01 track,track point,2026-10-29T13:36:41Z,51.98445851018538,5.665628734527215,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:43Z,51.98444826737182,5.665586772120836,SE corner tooth left after lobe removal
 g01 track,track point,2026-10-29T13:36:45Z,51.98444276245098,5.665546744362649,SE corner tooth left after lobe removal
 g01 track,track point,2026-10-29T13:36:58Z,51.98445715814924,5.6655229794475845,SE corner tooth left after lobe removal
 g01 track,track point,2026-10-29T13:37:00Z,51.984474206988786,5.665491376368084,SE corner tooth left after lobe removal
-g01 track,track point,2026-10-29T13:37:02Z,51.98449190217294,5.665474317872546,SE corner tooth left after lobe removal
-g01 track,track point,2026-10-29T13:37:21Z,51.98449031698419,5.66543902117326,SE corner tooth left after lobe removal
 g03 waypoints,waypoint '2:56:04 PM',2026-10-29T13:56:04Z,51.9841417106061,5.6651729515856735,"accidental tap, far south of lawn"
 trees,147 track points (2 segments),,,,track not needed; keep waypoints t01-t16 only
