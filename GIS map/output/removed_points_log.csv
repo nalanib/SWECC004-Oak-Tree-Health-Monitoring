@@ -20,5 +20,33 @@ g01 track,track point,2026-10-29T13:43:09Z,51.98552724004264,5.665657123597845,p
 g01 track,track point,2026-10-29T13:43:11Z,51.98549253680314,5.665656075571353,pond outline detour onto the bridge (path1)
 g01 track,track point,2026-10-29T13:43:26Z,51.98547498502218,5.6656462379073576,pond outline detour onto the bridge (path1)
 g01 track,track point,2026-10-29T13:43:28Z,51.98546329177579,5.665608907778165,pond outline detour onto the bridge (path1)
+g01 track,track point,2026-10-29T13:35:36Z,51.98483635461087,5.665653630135048,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:35:46Z,51.98484456017067,5.665682511717494,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:35:48Z,51.984845851036766,5.665732215871855,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:35:50Z,51.984846274052515,5.665776690054766,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:35:52Z,51.98484712031145,5.665820206206132,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:35:54Z,51.984840571521076,5.6658607722234064,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:35:56Z,51.98482781286986,5.665891334916038,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:35:59Z,51.98481108915631,5.665904282135442,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:01Z,51.98478571327981,5.665927745891454,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:03Z,51.98476883094348,5.665965750425839,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:05Z,51.98475325594299,5.6660016310243675,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:07Z,51.98473362168594,5.666021567812797,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:09Z,51.984713198483284,5.666018061975156,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:11Z,51.984691710079424,5.666006311876934,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:13Z,51.984669112737535,5.665995961557564,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:15Z,51.98464762032679,5.665980585035398,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:17Z,51.98462473258074,5.665968144073942,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:19Z,51.98460404044277,5.665958152002651,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:21Z,51.98458384595478,5.665948815653711,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:23Z,51.98456768540674,5.665930869643186,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:27Z,51.98455899329623,5.66590262257852,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:29Z,51.98454874117094,5.665872700092552,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:31Z,51.98453144974892,5.665832178949963,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:33Z,51.98451260656078,5.665795756097614,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:35Z,51.9844970516106,5.665756045655765,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:37Z,51.984483713666144,5.665714817713022,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:39Z,51.98446847027193,5.665673109569088,south-east lobe (v01-v04) outside pond edge
+g01 track,track point,2026-10-29T13:36:41Z,51.98445851018538,5.665628734527215,south-east lobe (v01-v04) outside pond edge
 g03 waypoints,waypoint '2:56:04 PM',2026-10-29T13:56:04Z,51.9841417106061,5.6651729515856735,"accidental tap, far south of lawn"
 trees,147 track points (2 segments),,,,track not needed; keep waypoints t01-t16 only

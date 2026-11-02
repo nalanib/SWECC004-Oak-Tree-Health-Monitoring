@@ -106,6 +106,16 @@ for gid, (fname, label) in POLYGONS.items():
             removed.append(dict(layer="g01 track", what="track point", time=p["time"],
                                 lat=p["lat"], lon=p["lon"], reason="pond outline detour onto the bridge (path1)"))
         pts = [p for p in pts if p not in bridge_pts]
+        # FIX 1d: remove the south-east lobe at the start of the walk (v01 -> v02 ->
+        # v03 -> v04, 13:35:36-13:36:41, 28 pts incl. the start point, which left a
+        # 1.5 m hook) that bulges east of the pond's straight east edge; the outline
+        # now runs straight from the finish point (v16) down to v04.
+        lobe = [p for p in pts if "2026-10-29T13:35:36Z" <= p["time"] <= "2026-10-29T13:36:41Z"]
+        assert len(lobe) == 28, f"g01 lobe: expected 28, found {len(lobe)}"
+        for p in lobe:
+            removed.append(dict(layer="g01 track", what="track point", time=p["time"],
+                                lat=p["lat"], lon=p["lon"], reason="south-east lobe (v01-v04) outside pond edge"))
+        pts = [p for p in pts if p not in lobe]
 
     if gid == "g03":  # FIX 3
         # iOS writes a narrow no-break space (U+202F) before "PM"; normalise it
@@ -247,8 +257,29 @@ handles += [Line2D([], [], color="#c0392b", lw=1.8, label="Paths (path1–path4)
             Line2D([], [], color="#222", ls="--", lw=1.4, label="Dashed = outside planned area (g02, g07, path4)"),
             Line2D([], [], color="#555", ls=":", lw=0.8, label="Survey extent (all features + 10 m)")]
 ax.legend(handles=handles, loc="upper left", fontsize=7.5, framealpha=0.92)
+# Site basemap: PDOK aerial photo, falling back to OpenStreetMap. Needs network
+# access to service.pdok.nl / tile.openstreetmap.org; without it the map is drawn
+# without a background and the footnote says so.
+BASEMAP_NOTE = "\nNo basemap: tile servers unreachable when this map was built"
+try:
+    import contextily as cx
+    from xyzservices import TileProvider
+    pdok = TileProvider(name="PDOK aerial", attribution="Luchtfoto © PDOK (CC BY 4.0)", max_zoom=19,
+                        url="https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_orthoHR/EPSG:3857/{z}/{x}/{y}.jpeg")
+    for prov in (pdok, cx.providers.OpenStreetMap.Mapnik):
+        try:
+            cx.add_basemap(ax, crs=RD, source=prov, zoom=18, attribution=False)
+            BASEMAP_NOTE = f"\nBasemap: {prov.attribution}"
+            break
+        except Exception as e:  # tile host blocked/offline -> try the next one
+            print(f"basemap {prov.name} unavailable: {type(e).__name__}")
+except ImportError:
+    pass
+ax.set_xlim(minx - 25, maxx + 25)
+ax.set_ylim(miny - 25, maxy + 25)
 ax.text(0.99, 0.01, "CRS: Amersfoort / RD New (EPSG:28992) · GPS: Open GPX Tracker (iOS), accuracy ≈ 3–5 m\n"
-        "Cleaned: g01 2 glitch pts + 1 back-step + 18 bridge-detour pts removed · g03 stray waypoint removed · trees = waypoints only",
+        "Cleaned: g01 glitch (3 pts), bridge detours (18 pts) and SE lobe (28 pts) removed · g03 stray waypoint removed · trees = waypoints only"
+        + BASEMAP_NOTE,
         transform=ax.transAxes, ha="right", va="bottom", fontsize=6.5, color="#444")
 fig.tight_layout()
 fig.savefig(os.path.join(OUT, "swecc004_field_map.png"))
