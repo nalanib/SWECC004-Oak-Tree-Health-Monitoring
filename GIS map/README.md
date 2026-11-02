@@ -9,6 +9,7 @@ Then run `QT_QPA_PLATFORM=offscreen python3 build_qgis_project.py` with the QGIS
 ## Outputs (`output/`)
 | File | Contents |
 |---|---|
+| **`swecc004_arcgis.zip`** | **ArcGIS Pro / Online.** Contains the file geodatabase `swecc004_field_map.gdb` (EPSG:28992), the tree photos, `photo_match_table.csv`, `arcgis_add_photos.py` (attaches the photos in Pro) and `README_ArcGIS.txt` with step-by-step instructions. Built by `build_arcgis.py` |
 | **`swecc004_field_map.kmz`** | **Phone or no GIS software:** open it in Google Earth (iOS/Android app, or earth.google.com > Projects > Import KML file) to see all layers over satellite imagery. It also imports into QGIS and ArcGIS (WGS84). Built by `build_kmz.py` |
 | **`swecc004_qgis_package.zip`** | **Unzip and double-click `swecc004_field_map.qgz` to open in QGIS.** The project contains the styled and labelled layers, a PDOK aerial photo and an OpenStreetMap basemap (loaded live when online, in RD New), and the print layout "SWECC004 field map" (A3) with legend, scale bar and north arrow. Export it via Project > Layouts |
 | `swecc004_field_map.qgz` | Same QGIS project; keep it in the same folder as the .gpkg |
