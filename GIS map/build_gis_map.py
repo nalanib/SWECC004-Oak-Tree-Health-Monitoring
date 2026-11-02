@@ -182,6 +182,56 @@ joined = gpd.sjoin(trees, polys[["id", "geometry"]].rename(columns={"id": "in_po
 assert len(joined) == len(trees), "a tree falls in more than one polygon"
 trees["in_polygon"] = joined["in_polygon"].fillna("").values
 
+# ------------------------------------------- Arboreal measurements (trees)
+# raw_measurements/Measurements Arboreal.csv: one row per tree, Name T01-T16,
+# times in local time (CET = UTC+1), photo per tree. Joined on ID (T01 -> t01);
+# the match is checked on time and position. The GPX point stays the position.
+import shutil
+
+import pandas as pd
+
+MEAS = os.path.join(HERE, "raw_measurements")
+arb = pd.read_csv(os.path.join(MEAS, "Measurements Arboreal.csv"), skipinitialspace=True)
+arb.columns = [c.strip() for c in arb.columns]
+# strip padding and normalise iOS narrow no-break spaces (U+202F) in "2:31 PM"
+arb = arb.apply(lambda s: s.map(lambda v: " ".join(v.replace("\u202f", " ").split()) if isinstance(v, str) else v)
+                if not pd.api.types.is_numeric_dtype(s) else s)
+arb["id"] = arb["Name"].str.lower()
+assert sorted(arb["id"]) == list(trees["id"]), "Arboreal names do not match t01-t16"
+arb = arb.set_index("id").loc[trees["id"]]
+# time check: Arboreal local time (UTC+1) within 3 min of the GPX waypoint (UTC)
+for tid, r in arb.iterrows():
+    t_loc = pd.to_datetime(f"2026-10-29 {r['Time']}", format="%Y-%m-%d %I:%M %p")
+    t_gpx = pd.to_datetime(trees.set_index("id").loc[tid, "time"]).tz_localize(None) + pd.Timedelta(hours=1)
+    assert abs((t_loc - t_gpx).total_seconds()) <= 180, f"{tid}: time mismatch {t_loc} vs {t_gpx}"
+centre = gpd.GeoSeries(gpd.points_from_xy(arb["Tree center longitude"], arb["Tree center latitude"]),
+                       crs="EPSG:4326").to_crs(RD).values
+offset = [c.distance(g) for c, g in zip(centre, trees.geometry)]
+for tid, d, acc in zip(trees["id"], offset, arb["Accuracy (m)"]):
+    others = trees[trees["id"] != tid].geometry.distance(centre[list(trees["id"]).index(tid)]).min()
+    assert d < others, f"{tid}: Arboreal position is closer to another tree"
+    assert d <= max(6.0, acc), f"{tid}: offset {d:.1f} m exceeds GPS accuracy {acc:.1f} m"
+
+SPECIES_FIX = {"Lach unknown (larix spec.)": "Larch unknown (Larix spec.)"}  # typo in export
+trees["species"] = [SPECIES_FIX.get(s, s) for s in arb["Tree species"]]
+trees["height_m"] = arb["Perpendicular height (m)"].astype(float).values
+trees["dbh_cm"] = arb["Diameter (cm)"].astype(float).values
+trees["breast_height_m"] = arb["Breast height (m)"].astype(float).values
+trees["inclination_deg"] = arb["Inclination°"].str.rstrip("°").astype(float).values
+trees["arboreal_time_local"] = arb["Time"].values
+trees["arboreal_accuracy_m"] = arb["Accuracy (m)"].round(1).values
+trees["arboreal_lat"] = arb["Tree center latitude"].values
+trees["arboreal_lon"] = arb["Tree center longitude"].values
+trees["offset_arboreal_m"] = [round(d, 1) for d in offset]
+trees["photo"] = ["photos/" + f for f in arb["Imagename"]]
+QA = {"t05": "Arboreal GPS accuracy 20.8 m; position offset 18 m - GPX position kept",
+      "t07": "Height 38.1 m is implausible for a silver birch with 30.7 cm DBH - re-measure"}
+trees["qa_note"] = [QA.get(t, "") for t in trees["id"]]
+assert trees["photo"].map(lambda p: os.path.exists(os.path.join(MEAS, p[7:]))).all(), "missing photo"
+os.makedirs(os.path.join(OUT, "photos"), exist_ok=True)
+for p in trees["photo"]:
+    shutil.copy2(os.path.join(MEAS, p[7:]), os.path.join(OUT, p))
+
 # -------------------------------------------------------------- study area
 everything = list(polys.geometry) + list(paths.geometry) + list(trees.geometry)
 minx, miny, maxx, maxy = gpd.GeoSeries(everything, crs=RD).total_bounds
@@ -243,8 +293,9 @@ for _, r in paths.iterrows():
             path_effects=[pe.withStroke(linewidth=2.5, foreground="white")])
 trees.plot(ax=ax, color="#145a32", markersize=38, edgecolor="white", lw=0.8, zorder=5)
 for _, r in trees.iterrows():
-    ax.annotate(r.id, (r.geometry.x, r.geometry.y), xytext=(4, 4), textcoords="offset points",
-                fontsize=7, color="#145a32", weight="bold", zorder=6,
+    sp = r.species.split(" (")[0].replace(" unknown", "")
+    ax.annotate(f"{r.id} {sp}", (r.geometry.x, r.geometry.y), xytext=(4, 4), textcoords="offset points",
+                fontsize=6.5, color="#145a32", weight="bold", zorder=6,
                 path_effects=[pe.withStroke(linewidth=2.5, foreground="white")])
 ax.set_aspect("equal")
 ax.set_xlim(minx - 25, maxx + 25)
@@ -263,7 +314,7 @@ ax.annotate("N", xy=(maxx + 15, maxy + 15), xytext=(maxx + 15, maxy - 10), ha="c
             weight="bold", arrowprops=dict(arrowstyle="-|>", color="k", lw=1.5))
 handles = [Patch(facecolor=COL[g], alpha=0.55, edgecolor="#222", label=f"{g} {POLYGONS[g][1]}") for g in COL]
 handles += [Line2D([], [], color="#c0392b", lw=1.8, label="Paths (path1–path4)"),
-            Line2D([], [], marker="o", color="w", markerfacecolor="#145a32", markersize=7, label="Oak trees t01–t16"),
+            Line2D([], [], marker="o", color="w", markerfacecolor="#145a32", markersize=7, label="Trees t01–t16 (Arboreal: species, height, DBH)"),
             Line2D([], [], color="#222", ls="--", lw=1.4, label="Dashed = outside planned area (g02, g07, path4)"),
             Line2D([], [], color="#555", ls=":", lw=0.8, label="Survey extent (all features + 10 m)")]
 ax.legend(handles=handles, loc="upper left", fontsize=7.5, framealpha=0.92)
@@ -296,6 +347,18 @@ fig.savefig(os.path.join(OUT, "swecc004_field_map.png"))
 fig.savefig(os.path.join(OUT, "swecc004_field_map.pdf"))
 
 # ------------------------------------------------------- interactive map
+import base64
+import io
+
+from PIL import Image
+
+thumbs = {}  # small embedded tree photos for the popups
+for _, r in trees.iterrows():
+    im = Image.open(os.path.join(OUT, r.photo))
+    im.thumbnail((440, 440))
+    buf = io.BytesIO()
+    im.convert("RGB").save(buf, "JPEG", quality=80)
+    thumbs[r.id] = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 LEAF = os.environ.get("LEAFLET_DIR")  # folder holding leaflet.js / leaflet.css (inlined if given)
 if LEAF:
     js = open(os.path.join(LEAF, "leaflet.js")).read()
@@ -314,14 +377,15 @@ const COL={json.dumps(COL)};
 const map=L.map('map');
 const osm=L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png',{{maxZoom:20,maxNativeZoom:19,attribution:'© OpenStreetMap contributors'}}).addTo(map);
 const air=L.tileLayer('https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_orthoHR/EPSG:3857/{{z}}/{{x}}/{{y}}.jpeg',{{maxZoom:21,maxNativeZoom:19,attribution:'Luchtfoto © PDOK'}});
-const pop=p=>Object.entries(p).map(([k,v])=>`<b>${{k}}</b>: ${{v}}`).join('<br>');
+const THUMB={json.dumps(thumbs)};
+const pop=p=>(THUMB[p.id]?`<img src="${{THUMB[p.id]}}" style="width:220px;display:block;margin-bottom:4px">`:'')+Object.entries(p).filter(([k,v])=>v!==''&&v!==null).map(([k,v])=>`<b>${{k}}</b>: ${{v}}`).join('<br>');
 const study=L.geoJSON(D.study,{{style:{{color:'#555',weight:1,dashArray:'6 4',fill:false}}}}).addTo(map);
 const polys=L.geoJSON(D.polygons,{{style:f=>({{color:'#222',weight:f.properties.outside_planned_area?2:1,dashArray:f.properties.outside_planned_area?'5 4':null,fillColor:COL[f.properties.id],fillOpacity:.45}}),
   onEachFeature:(f,l)=>{{l.bindPopup(pop(f.properties));l.bindTooltip(f.properties.id+' '+f.properties.label);}}}}).addTo(map);
 const paths=L.geoJSON(D.paths,{{style:f=>({{color:'#c0392b',weight:3,dashArray:f.properties.outside_planned_area?'6 5':null}}),
   onEachFeature:(f,l)=>{{l.bindPopup(pop(f.properties));l.bindTooltip(f.properties.id);}}}}).addTo(map);
 const trees=L.geoJSON(D.trees,{{pointToLayer:(f,ll)=>L.circleMarker(ll,{{radius:6,color:'#fff',weight:1,fillColor:'#145a32',fillOpacity:1}}),
-  onEachFeature:(f,l)=>{{l.bindPopup(pop(f.properties));l.bindTooltip(f.properties.id,{{permanent:true,direction:'right',className:'lbl'}});}}}}).addTo(map);
+  onEachFeature:(f,l)=>{{l.bindPopup(pop(f.properties));l.bindTooltip(f.properties.id+' '+f.properties.species.split(' (')[0].replace(' unknown',''),{{permanent:true,direction:'right',className:'lbl'}});}}}}).addTo(map);
 L.control.layers({{'OpenStreetMap':osm,'Aerial photo (PDOK)':air}},{{'Survey extent':study,'Habitat polygons g01–g07':polys,'Paths path1–path4':paths,'Trees t01–t16':trees}}).addTo(map);
 L.control.scale({{imperial:false}}).addTo(map);
 map.fitBounds(study.getBounds());

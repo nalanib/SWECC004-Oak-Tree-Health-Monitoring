@@ -12,7 +12,7 @@ Then run `QT_QPA_PLATFORM=offscreen python3 build_qgis_project.py` with the QGIS
 | **`swecc004_field_map.kmz`** | **Phone or no GIS software:** open it in Google Earth (iOS/Android app, or earth.google.com > Projects > Import KML file) to see all layers over satellite imagery. It also imports into QGIS and ArcGIS (WGS84). Built by `build_kmz.py` |
 | **`swecc004_qgis_package.zip`** | **Unzip and double-click `swecc004_field_map.qgz` to open in QGIS.** The project contains the styled and labelled layers, a PDOK aerial photo and an OpenStreetMap basemap (loaded live when online, in RD New), and the print layout "SWECC004 field map" (A3) with legend, scale bar and north arrow. Export it via Project > Layouts |
 | `swecc004_field_map.qgz` | Same QGIS project; keep it in the same folder as the .gpkg |
-| `swecc004_field_map.gpkg` | GeoPackage, EPSG:28992 (RD New). Layers: `habitat_polygons` (g01–g07), `paths` (path1–path4), `trees` (t01–t16), `study_area_extent` |
+| `swecc004_field_map.gpkg` | GeoPackage, EPSG:28992 (RD New). Layers: `habitat_polygons` (g01–g07), `paths` (path1–path4), `trees` (t01–t16, with Arboreal measurements and a photo path), `study_area_extent` |
 | `swecc004_field_map.png` / `.pdf` | Static map. The script adds a PDOK aerial photo (or OpenStreetMap) background automatically when `service.pdok.nl` or `tile.openstreetmap.org` can be reached; otherwise it is drawn without a background and the footnote says so |
 | `swecc004_field_map.html` | **Site map with basemap.** Open it in a browser while online to see OpenStreetMap or a PDOK aerial photo under the data (switch with the layer control, top right) |
 | `removed_points_log.csv` | Every point that was deleted, and why |
@@ -27,6 +27,17 @@ Then run `QT_QPA_PLATFORM=offscreen python3 build_qgis_project.py` with the QGIS
 3. **g03:** deleted the stray waypoint "2:56:04 PM" (lat 51.98414, lon 5.66517, about 150 m south of the lawn). The g03 polygon is built from its track only.
 4. **IDs** follow the file names: `g01`–`g07`, `path1`–`path4`, `t01`–`t16`. The printed form uses different numbering. Fill `form_id_on_paper` in the template before joining attributes.
 5. **Extent** is computed from all features, so it includes g02, g07 and path4.
+6. **Tree measurements (Arboreal):** `raw_measurements/Measurements Arboreal.csv` and its 16 photos are joined to the tree points on ID (T01 → t01). The script checks each match:
+   - The Arboreal time (local, UTC+1) is within 3 minutes of the GPS waypoint time.
+   - The Arboreal tree centre is nearest to the tree with the same ID, and within GPS accuracy of it.
+
+   The GPS waypoint is kept as the position; the Arboreal coordinates are stored as `arboreal_lat`/`arboreal_lon`, with the distance between the two in `offset_arboreal_m`.
+   - **Fields added:** `species`, `height_m` (perpendicular height), `dbh_cm`, `breast_height_m`, `inclination_deg`, `arboreal_time_local`, `arboreal_accuracy_m`, `photo` (`photos/…jpg`, relative to `output/`) and `qa_note`.
+   - **Not added:** the crown and CAI columns, because they are empty in the export, and Arboreal's internal AR marker coordinates. Both stay in the raw CSV.
+   - **Typo fixed:** "Lach unknown (larix spec.)" → "Larch unknown (Larix spec.)".
+   - **QA notes:**
+     - t05: Arboreal GPS accuracy was 20.8 m, and its position is 18 m from the waypoint, so the waypoint position is used.
+     - t07: a height of 38.1 m is implausible for a silver birch with a 30.7 cm DBH; this tree should be re-measured.
 
 Polygons are built from the walked track (track points), not from the g01 vertex waypoints.
 
@@ -45,7 +56,7 @@ It contains:
   - g06 Atlas, unmowed (11 360 m²)
   - g07 unmowed trees/shrubs (2 063 m²)
 - 4 walked paths (path1 294 m, path2 100 m, path3 280 m, path4 192 m)
-- 16 oak trees (t01–t16)
+- 16 trees (t01–t16), measured with Arboreal. Species: Norway maple, silver birch (2), wild cherry, weeping willow (t06), Salix × sepulcralis (t04, the botanical name for weeping willow, so the species names could be harmonised), larch, hawthorn, ash (2), sweet gum, Caucasian wingnut, bald cypress, cotoneaster and basswood (2)
 
 g02, g07 and path4 lie in the south-west corner of the survey, outside the originally planned area. They are part of the study area, and so are trees t01 and t02 (inside g02) and t03 (inside g07).
 

@@ -64,10 +64,28 @@ folders.append(("Paths path1–path4", pm))
 styles.append('<Style id="s_tree"><IconStyle><color>ff325a14</color><scale>0.9</scale><Icon>'
               '<href>http://maps.google.com/mapfiles/kml/shapes/parks.png</href></Icon></IconStyle>'
               '<LabelStyle><color>ffffffff</color><scale>0.9</scale></LabelStyle></Style>')
-pm = [f'<Placemark><name>{r.id}</name><description>{desc(r)}</description><styleUrl>#s_tree</styleUrl>'
+from PIL import Image  # noqa: E402
+import io  # noqa: E402
+images = {}  # photos embedded in the KMZ (downscaled), shown in the balloon
+for _, r in trees.iterrows():
+    im = Image.open(os.path.join(OUT, r.photo))
+    im.thumbnail((900, 900))
+    buf = io.BytesIO()
+    im.convert("RGB").save(buf, "JPEG", quality=82)
+    images["files/" + os.path.basename(r.photo)] = buf.getvalue()
+
+
+def tree_desc(r):
+    head = (f'<img src="files/{os.path.basename(r.photo)}" width="300"><br>'
+            f'<b>{escape(r.species)}</b><br>Height {r.height_m} m · DBH {r.dbh_cm} cm')
+    note = f'<br><b>Note:</b> {escape(r.qa_note)}' if r.qa_note else ''
+    return desc(r).replace("<![CDATA[", "<![CDATA[" + head + note + "<hr>")
+
+
+pm = [f'<Placemark><name>{r.id} {escape(r.species.split(" (")[0].replace(" unknown", ""))}</name><description>{tree_desc(r)}</description><styleUrl>#s_tree</styleUrl>'
       f'<Point><coordinates>{r.geometry.x:.8f},{r.geometry.y:.8f},0</coordinates></Point></Placemark>'
       for _, r in trees.iterrows()]
-folders.append(("Oak trees t01–t16", pm))
+folders.append(("Trees t01–t16 (Arboreal)", pm))
 
 # survey extent
 styles.append('<Style id="s_ext"><LineStyle><color>ff00ccff</color><width>2</width></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>')
@@ -87,4 +105,6 @@ kml = ('<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.n
 kmz = os.path.join(OUT, "swecc004_field_map.kmz")
 with zipfile.ZipFile(kmz, "w", zipfile.ZIP_DEFLATED) as z:
     z.writestr("doc.kml", kml)
+    for name, data in images.items():
+        z.writestr(name, data)
 print("wrote", kmz)

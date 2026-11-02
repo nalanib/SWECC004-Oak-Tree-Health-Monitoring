@@ -121,11 +121,19 @@ for expr, n in (('NOT "outside_planned_area"', 3), ('"outside_planned_area"', 1)
     assert sum(1 for _ in paths.getFeatures(QgsFeatureRequest().setFilterExpression(expr))) == n, expr
 label(paths, "\"id\"", 8, "#c0392b", QgsPalLayerSettings.Curved)
 
-trees = vlayer("trees", "Oak trees t01–t16")
+trees = vlayer("trees", "Trees t01–t16 (Arboreal)")
 tsym = QgsMarkerSymbol.createSimple({"name": "circle", "color": "#145a32", "outline_color": "#ffffff",
                                      "outline_width": "0.4", "size": "3"})
 trees.setRenderer(QgsSingleSymbolRenderer(tsym))
-label(trees, "\"id\"", 8, "#145a32")
+label(trees, "\"id\" || ' ' || replace(regexp_replace(\"species\", ' \\\\(.*', ''), ' unknown', '')", 7.5, "#145a32")
+# photo field: show the image in the identify/attribute form (path relative to project)
+from qgis.core import QgsEditorWidgetSetup  # noqa: E402
+trees.setEditorWidgetSetup(trees.fields().indexOf("photo"), QgsEditorWidgetSetup(
+    "ExternalResource", {"DocumentViewer": 1, "DocumentViewerHeight": 320, "RelativeStorage": 1,
+                         "FileWidget": True, "FileWidgetButton": True, "UseLink": True, "FullUrl": False}))
+trees.setMapTipTemplate('<b>[% "id" %] – [% "species" %]</b><br>Height [% "height_m" %] m · DBH [% "dbh_cm" %] cm'
+                        '<br>[% "qa_note" %]<br><img src="file:///[% @project_folder %]/[% "photo" %]" width="260">')
+
 
 # Save the styles as default inside the GeoPackage as well
 for lyr in (study, polys, paths, trees):
